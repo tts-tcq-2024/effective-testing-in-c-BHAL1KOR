@@ -13,6 +13,7 @@ int networkAlertStub(float celcius) {
 
 // Real function for production (example)
 int networkAlertReal(float celcius) {
+    printf("ALERT: Temperature is %.1f celcius.\n", celcius);
     // Real network alert code would go here
     return 200; // Simulate success
 }
