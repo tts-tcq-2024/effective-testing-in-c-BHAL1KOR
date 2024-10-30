@@ -1,31 +1,43 @@
 #include <stdio.h>
 #include <assert.h>
+// Function pointer for alert function
+int (*networkAlert)(float);
+
+// Stub function for testing
+int networkAlertStub(float celcius) {
+    if (celcius > 200.0) {
+        return 500; // Simulate failure
+    }
+    return 200; // Simulate success
+}
+
+// Real function for production (example)
+int networkAlertReal(float celcius) {
+    printf("ALERT: Temperature is %.1f celcius.\n", celcius);
+    // Real network alert code would go here
+    return 200; // Simulate success
+}
 
 int alertFailureCount = 0;
 
-int networkAlertStub(float celcius) {
-    printf("ALERT: Temperature is %.1f celcius.\n", celcius);
-    // Return 200 for ok
-    // Return 500 for not-ok
-    // stub always succeeds and returns 200
-    return 200;
-}
-
 void alertInCelcius(float farenheit) {
     float celcius = (farenheit - 32) * 5 / 9;
-    int returnCode = networkAlertStub(celcius);
-    if (returnCode != 200) {
-        // non-ok response is not an error! Issues happen in life!
-        // let us keep a count of failures to report
-        // However, this code doesn't count failures!
-        // Add a test below to catch this bug. Alter the stub above, if needed.
-        alertFailureCount += 0;
+    int responseCode = networkAlert(celcius);
+    if (responseCode != 200) {
+        alertFailureCount += 1;
     }
 }
 
 int main() {
     alertInCelcius(400.5);
     alertInCelcius(303.6);
+    assert(alertFailureCount == 0);
+    // Set the function pointer to the stub for testing
+    networkAlert = networkAlertStub;
+
+    alertInCelcius(400.5);
+    alertInCelcius(303.6);
+     assert(alertFailureCount == 2);
     printf("%d alerts failed.\n", alertFailureCount);
     printf("All is well (maybe!)\n");
     return 0;
