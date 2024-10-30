@@ -35,14 +35,13 @@ const char* ExpectedColorPair =
         "23 | Violet | Brown \n"
         "24 | Violet | Slate \n";
 
-
 void generateColorMap(ColorPair colorMap[], int* size) {
     const char* majorColor[] = {"White", "Red", "Black", "Yellow", "Violet"};
     const char* minorColor[] = {"Blue", "Orange", "Green", "Brown", "Slate"};
     int i = 0, j = 0, index = 0;
     for(i = 0; i < 5; i++) {
         for(j = 0; j < 5; j++) {
-            colorMap[index].pairNumber = index + 1;
+            colorMap[index].pairNumber = index;
             strcpy(colorMap[index].majorColor, majorColor[i]);
             strcpy(colorMap[index].minorColor, minorColor[j]);
             index++;
@@ -51,9 +50,12 @@ void generateColorMap(ColorPair colorMap[], int* size) {
     *size = index;
 }
 
-void printColorMap(ColorPair colorMap[], int size) {
+void colorMapToString(ColorPair colorMap[], int size, char* buffer, int bufferSize) {
+    buffer[0] = '\0'; // Initialize buffer with empty string
     for(int i = 0; i < size; i++) {
-        printf("%2d | %-6s | %-6s\n", colorMap[i].pairNumber, colorMap[i].majorColor, colorMap[i].minorColor);
+        char line[32];
+        snprintf(line, sizeof(line), "%2d | %-6s | %-6s\n", colorMap[i].pairNumber, colorMap[i].majorColor, colorMap[i].minorColor);
+        strncat(buffer, line, bufferSize - strlen(buffer) - 1);
     }
 }
 
@@ -62,9 +64,11 @@ int main() {
     int size = 0;
     generateColorMap(colorMap, &size);
     assert(size == 25);
-    strcmp(colorMap, ExpectedColorPair) == 0);
 
-    printColorMap(colorMap, size);
+    char colorMapString[1024];
+    colorMapToString(colorMap, size, colorMapString, sizeof(colorMapString));
+    assert(strcmp(colorMapString, ExpectedColorPair) == 0);
+
     printf("All is well (maybe!)\n");
     return 0;
 }
